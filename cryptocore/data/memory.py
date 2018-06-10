@@ -24,20 +24,20 @@ class InMemoryDataClient(BaseDataClient):
         returned_data = {}
         before = before or time.time()
         after = after or 0
-                
+
         for ticker in BaseDataClient._ensure_list(tickers):
             returned_data[ticker] = [
                 quote for quote in self._in_memory_store[ticker]
                 if quote["timestamp"] < before and quote["timestamp"] > after
             ]
-        
+
         return returned_data
 
     def load_latest_quote_data(self, tickers, previous_n=1):
-        raise NotImplementedError("Loading available for InMemoryDataClient")
+        raise NotImplementedError("Loading not available for InMemoryDataClient")
 
     def load_between_quote_data(self, tickers, before=None, after=None):
-        raise NotImplementedError("Loading available for InMemoryDataClient")
+        raise NotImplementedError("Loading not available for InMemoryDataClient")
 
     def list_tickers(self):
         return list(self._in_memory_store.keys())
