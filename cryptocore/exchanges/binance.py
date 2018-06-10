@@ -5,6 +5,7 @@ from operator import itemgetter
 from binance.websockets import BinanceSocketManager
 from binance.client import Client
 from twisted.internet import reactor
+from twisted.internet.error import ReactorNotRunning
 
 from .base import ExchangeClientBase
 from ..keychain import KeyChain
@@ -14,7 +15,7 @@ class BinanceExchangeService(ExchangeClientBase):
     Binance Exchange Services
     (Depends on 3rd party binance websockets library, python-binanc)e
     https://github.com/sammchardy/python-binance
-    
+
     binance_response_mapping:
         ("s", "symbol"),
     ("E", "timestamp"),
@@ -76,16 +77,16 @@ class BinanceExchangeService(ExchangeClientBase):
     def process_ticker_response(self, tickers_response):
         self.logger.debug("Received ticker response {}".format(tickers_response), truncate=480)
 
-        quotes = []        
+        quotes = []
         append_to_quotes = quotes.append
         for ticker_response in tickers_response:
             quote = dict(zip(
                 self._binance_quote_keys,
-                self._binance_item_getter(ticker_response)
+                self._binance_item_getter(ticker_response )
             ))
             quote["base"], quote["target"] = self.get_base_target(quote["ticker"])
             append_to_quotes(quote)
-        
+
         self.save_quotes(quotes)
         self.logger.info("Saved {} tickers".format(len(quotes)))
 
@@ -100,12 +101,21 @@ class BinanceExchangeService(ExchangeClientBase):
             self.process_ticker_response
         )
         self.binance_socket_manager.start()
-        
-        while True:            
-            time.sleep(60)
-            
+
+        while not self.EXCHANGE_STOPPED:
+            pass
+
 
     def stop(self):
+        try:
+            reactor.stop() # pylint: disable=E1101
+            self.binance_socket_manager.close()
+        except ReactorNotRunning:
+            pass
+
         super().stop()
-        reactor.stop() # pylint: disable=E1101
-        self.binance_socket_manager.close()
+
+
+if __name__ == "__main__":
+    exchange = BinanceExchangeService()
+    exchange.start()
