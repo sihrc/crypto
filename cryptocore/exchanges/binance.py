@@ -54,8 +54,8 @@ class BinanceExchangeService(ExchangeClientBase):
     _binance_item_getter = itemgetter(*_binance_item_getter)
 
 
-    def __init__(self):
-        ExchangeClientBase.__init__(self, "binance")
+    def __init__(self, **kwargs):
+        ExchangeClientBase.__init__(self, "binance", **kwargs)
 
         symbol_infos = requests.get(
             "https://api.binance.com/api/v1/exchangeInfo"
@@ -75,17 +75,22 @@ class BinanceExchangeService(ExchangeClientBase):
 
     def process_ticker_response(self, tickers_response):
         self.logger.debug("Received ticker response {}".format(tickers_response), truncate=480)
-        
+
+        quotes = []        
+        append_to_quotes = quotes.append
         for ticker_response in tickers_response:
-            self.save_quote(dict(zip(
+            quote = dict(zip(
                 self._binance_quote_keys,
                 self._binance_item_getter(ticker_response)
-            )))
+            ))
+            quote["base"], quote["target"] = self.get_base_target(quote["ticker"])
+            append_to_quotes(quote)
         
-        self.logger.info("Saved {} tickers".format(len(tickers_response)))
+        self.save_quotes(quotes)
+        self.logger.info("Saved {} tickers".format(len(quotes)))
 
 
-    def get_base_quote(self, ticker):
+    def get_base_target(self, ticker):
         return self.binance_symbol_mapping[ticker]
 
 
