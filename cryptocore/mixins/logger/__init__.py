@@ -6,18 +6,31 @@ from .colored_logging import ColoredFormatter
 
 from cryptocore.config import ENVIRONMENT, LOG_PATH
 
+DEFAULT_LOGGING_LEVEL = logging.DEBUG if ENVIRONMENT == "development" else logging.INFO
 
 _PATH = os.path.join(LOG_PATH, "{name}.log")
 _FORMATTER = ColoredFormatter(
     "[%(name)s][%(levelname)s]: %(asctime)-15s %(location)s %(message)s", datefmt="%m-%d-%y-%I:%M:%S%p"
 )
 
+class CustomLogger(logging.Logger):
+    def _log(self, level, msg, args, truncate=None, **kwargs):
+        if truncate is not None:
+            msg = msg[:truncate]
+        return super()._log(level, msg, args, **kwargs)
+     
+
+logging.setLoggerClass(CustomLogger)
+def set_logging_level(level):
+    global DEFAULT_LOGGING_LEVEL
+    DEFAULT_LOGGING_LEVEL = level
+
 
 def configure_logger():
-    DEFAULT_LOGGING_LEVEL = logging.DEBUG if ENVIRONMENT == "development" else logging.INFO
-
     # Default logging level to ERROR
     logging.getLogger().setLevel(logging.ERROR)
+    logging.getLogger("requests").setLevel(logging.CRITICAL)
+    logging.getLogger("urllib").setLevel(logging.CRITICAL)
 
     root = logging.getLogger("crypto")
     root.setLevel(DEFAULT_LOGGING_LEVEL)
@@ -48,7 +61,7 @@ DEBUG_LOGGER.setLevel(logging.DEBUG)
 
 def get_logger(name):
     handler = logging.FileHandler(
-        _PATH.format("crypto-" + name)
+        _PATH.format(name="crypto-" + name)
     )
     handler.setFormatter(_FORMATTER)
 

@@ -2,6 +2,7 @@ version: '3'
 
 services:
   crypto:
+    tty: true
     build: ./
     image: crypto
     container_name: crypto

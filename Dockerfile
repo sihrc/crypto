@@ -13,10 +13,18 @@ RUN apk update && \
     if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
     if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
     rm -r /root/.cache && \
-    pip2 install supervisor
+    pip2 install supervisor && \
+    apk add --no-cache libffi-dev openssl-dev
+
+RUN pip3 install    ccxt \
+                    cfscrape \
+                    python-binance \
+                    requests \
+                    websockets
 
 COPY . /crypto
 WORKDIR /crypto
 
 RUN python3 setup.py develop
+
 CMD ["bash"]

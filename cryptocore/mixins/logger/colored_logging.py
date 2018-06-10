@@ -30,10 +30,6 @@ class ColoredFormatter(Formatter):
         levelname = colored_record.levelname
         seq = MAPPING.get(levelname, 37)  # default white
         colored_record.levelname = color(seq, colored_record.levelname)
-
-        colored_record.request_id = color(
-            94, str(colored_record.request_id)[:8])
-        colored_record.identity = color(94, colored_record.identity)
         colored_record.location = color(90, "({filename}:{lineno})".format(
             filename=colored_record.filename,
             lineno=colored_record.lineno
