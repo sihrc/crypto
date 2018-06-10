@@ -1,10 +1,24 @@
 version: '3'
 
 services:
+  crypto-redis:
+    image: redis:3.2
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - redis-data:/data
+    ports:
+      - 0.0.0.0:6379:6379
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+
   crypto:
     tty: true
+    depends_on:
+      - crypto-redis
     build: ./
     image: crypto
     container_name: crypto
     volumes:
       - .:/crypto
+
+volumes:
+  redis-data:
