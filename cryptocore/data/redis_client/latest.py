@@ -50,7 +50,7 @@ class RedisLatestDataClient(BaseDataClient):
         return self.tickers_list
 
     def save_quotes_data(self, quote_infos):
-        super().save_quotes_data(quote_infos)
+        quote_infos = super().save_quotes_data(quote_infos)
 
         pipe = self.redis_client.pipeline()
         for quote_info in quote_infos:
@@ -62,7 +62,7 @@ class RedisLatestDataClient(BaseDataClient):
     def _format_redis_key(self, ticker):
         return self.exchange + "-" + ticker
 
-    def get_between_quote_data(self, tickers, before=None, after=None):
+    def get_between_quote_data(self, tickers, start=None, end=None):
         raise NotImplementedError(
             "Only the latest entry is available for RedisLatestDataClient")
 
@@ -71,6 +71,6 @@ class RedisLatestDataClient(BaseDataClient):
             raise NotImplementedError(
                 "Only the latest entry is available for RedisLatestDataClient")
 
-    def load_between_quote_data(self, tickers, before=None, after=None):
+    def load_between_quote_data(self, tickers, start=None, end=None):
         raise NotImplementedError(
             "Only the latest entry is available for RedisLatestDataClient")

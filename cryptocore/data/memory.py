@@ -20,7 +20,7 @@ class InMemoryDataClient(BaseDataClient):
             returned_data[ticker] = self._in_memory_store[ticker][:previous_n]
         return returned_data
 
-    def get_between_quote_data(self, tickers, before=None, after=None):
+    def get_between_quote_data(self, tickers, start=None, end=None):
         returned_data = {}
         before = before or time.time()
         after = after or 0
@@ -36,16 +36,16 @@ class InMemoryDataClient(BaseDataClient):
     def load_latest_quote_data(self, tickers, previous_n=1):
         raise NotImplementedError("Loading not available for InMemoryDataClient")
 
-    def load_between_quote_data(self, tickers, before=None, after=None):
+    def load_between_quote_data(self, tickers, start=None, end=None):
         raise NotImplementedError("Loading not available for InMemoryDataClient")
 
     def list_tickers(self):
         return list(self._in_memory_store.keys())
 
     def save_quotes_data(self, quote_infos):
-        super().save_quotes_data(quote_infos)
+        quote_infos = super().save_quotes_data(quote_infos)
 
-        for quote_info in BaseDataClient._ensure_list(quote_infos):
+        for quote_info in quote_infos:
             self._in_memory_store[quote_info["ticker"]].appendleft(quote_info)
 
         return quote_infos

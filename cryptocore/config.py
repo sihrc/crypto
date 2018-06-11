@@ -19,3 +19,9 @@ DEFAULT_REDIS_CONFIG = {
     "port": REDIS_PORT,
     "password": REDIS_PASSWORD
 }
+
+# CSV Data Client
+CSV_DATA_DIR = os.path.abspath(os.path.join(
+    os.path.dirname(__file__),
+    ".."
+))
