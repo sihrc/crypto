@@ -5,7 +5,7 @@ from collections import defaultdict, deque
 import datetime
 
 from ..base import BaseDataClient
-from . import CSV_FIELDS, CSV_FILE_FORMAT, TIMESTAMP_INDEX
+from .config import CSV_FIELDS, CSV_FILE_FORMAT, TIMESTAMP_INDEX
 
 from cryptocore.utils.time_utils import (
     GET_YEAR_DAY_HOUR, get_timetuple, get_tuples_in_interval, ensure_start_end, get_timetuple_since
